@@ -1,38 +1,43 @@
 #include <pthread.h>
-#include <iostream>
-#include <cstdlib>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define NUM_THREADS 10
 
 void *PrintHello(void *paramID) {
-    int *id = (int *)paramID;
-    std::cout << "Hello World! from thread #" << *id << "!" << std::endl;
+    int *id;
+    id = (int *)paramID;
+
+    printf("Hello World! from thread #%d!\n", *id);
     pthread_exit(NULL);
     return NULL; 
 }
 
 int main(int argc, char *argv[]) {
-    pthread_t threadID;
-    int rc, param;
+    pthread_t threadsID[NUM_THREADS];
+    int rc, t, param[NUM_THREADS];
 
-    // Ciclo for que crea el hilo y hace el join en el mismo ciclo
-    for (int t = 0; t < NUM_THREADS; t++) {
-        std::cout << "In main: creating thread " << t << std::endl;
-        param = t;
+    // Ciclo for para crear los hilos
+    for (t = 0; t < NUM_THREADS; t++) {
+        printf("In main: creating thread %d\n", t);
+        param[t] = t;
 
-        rc = pthread_create(&threadID, NULL, PrintHello, (void *)&param);
+        rc = pthread_create(&threadsID[t], NULL, PrintHello, (void *)&param[t]);
 
         if (rc) {
-            std::cerr << "ERROR; return code from pthread_create() is " << rc << std::endl;
-            exit(-1);
-        }
-
-        // Join del hilo inmediatamente después de crearlo
-        rc = pthread_join(threadID, NULL);
-        if (rc) {
-            std::cerr << "ERROR; return code from pthread_join() is " << rc << std::endl;
+            printf("ERROR; return code from pthread_create() is %d\n", rc);
             exit(-1);
         }
     }
+
+    // Ciclo for separado para hacer el join
+    for (t = 0; t < NUM_THREADS; t++) {
+        rc = pthread_join(threadsID[t], NULL);
+        if (rc) {
+            printf("ERROR; return code from pthread_join() is %d\n", rc);
+            exit(-1);
+        }
+    }
+
     return 0;
 }
