@@ -3,15 +3,19 @@
 #include <vector>
 
 struct FibonacciArgs {
-    int n;
-    long long result;
-    long long prev1;
-    long long prev2;
+    int n;              // Índice del número de Fibonacci que se quiere calcular
+    long long result;   // Resultado del cálculo del número de Fibonacci
+    long long prev1;    //El valor de F(n-1), el numeros anerior de la serie
+    long long prev2;    //Valor de F(n-2) dos numeros atras de la serie
 };
 
+//Esta funcion sera ejecutada por los hilos para calcular
+
 void* calcularFibonacci(void* args) {
-    FibonacciArgs* fibArgs = (FibonacciArgs*)args;
-    int n = fibArgs->n;
+    FibonacciArgs* fibArgs = (FibonacciArgs*)args;  //Convertir los argumentos
+    int n = fibArgs->n;     //obtiene el indice n
+
+    // Calcular el valor de Fibonacci según el índice n
 
     if (n == 0) {
         fibArgs->result = 0;
@@ -41,7 +45,12 @@ int main() {
         return 1;
     }
 
+    // Crear un vector para almacenar los identificadores de los hilos
+
     std::vector<pthread_t> threads(limite + 1);
+    
+    // Crear un vector para almacenar los argumentos de Fibonacci para cada hilo
+    
     std::vector<FibonacciArgs> fibArgs(limite + 1);
 
     // Inicializar los primeros dos elementos de la serie
@@ -63,7 +72,8 @@ int main() {
         pthread_join(threads[i], nullptr);
     }
 
-    long long sumaTotal = 0;
+    long long sumaTotal = 0; // Variable para acumular la suma de los resultados de Fibonacci
+
 
     // Imprimir los resultados de manera amigable
     for (int i = 0; i <= limite; ++i) {
@@ -77,6 +87,8 @@ int main() {
         }
         sumaTotal += fibArgs[i].result;
     }
+
+    // Imprimir la suma total de los números de Fibonacci calculados
 
     std::cout << "La suma total de los números de Fibonacci entre 0 y " << limite << " es: " << sumaTotal << std::endl;
 
